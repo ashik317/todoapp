@@ -1,0 +1,53 @@
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { AuthContext, AuthProvider } from './src/providers/AuthProviders';
+import HomeScreen from './src/screens/HomeScreens/HomeScreen';
+import SignUpScreen from './src/screens/AuthScreens/SignUpScreen';
+import SignInScreen from './src/screens/AuthScreens/SignInScreen';
+import * as React from 'react'
+import LogoutButton from './src/components/LogoutButton';
+import NewTrip from './src/screens/TripScreens/NewTrip';
+
+
+const OPTIONS = {
+  headerShown: false
+}
+
+const HomeStack = createStackNavigator()
+const AuthStack = createStackNavigator()
+
+const RenderHomeStack = ({ user }) => {
+  return (
+    <HomeStack.Navigator>
+      <HomeStack.Screen name='Homepage' component={HomeScreen} options={{ headerTitle: `Welcome ${user.nickname}`, headerRight: () => <LogoutButton /> }} />
+      <HomeStack.Screen name='create-trip' component={NewTrip} options={{ headerTitle: 'Create a new Trip' }} />
+    </HomeStack.Navigator>
+  )
+}
+
+const RenderAuthStack = () => {
+  return (
+    <AuthStack.Navigator initialRouteName='Signin'>
+      <AuthStack.Screen name='Signup' component={SignUpScreen} options={OPTIONS} />
+      <AuthStack.Screen name='Signin' component={SignInScreen} options={OPTIONS} />
+    </AuthStack.Navigator>
+  )
+}
+
+const App = () => {
+  return (
+    <AuthProvider>
+      <AuthContext.Consumer>
+        {(
+          (auth) => (
+            <NavigationContainer>
+              {auth.isLoggedIn ? <RenderHomeStack user={auth.userDetails} /> : <RenderAuthStack />}
+            </NavigationContainer>
+          )
+        )}
+      </AuthContext.Consumer>
+    </AuthProvider>
+  );
+}
+
+export default App
